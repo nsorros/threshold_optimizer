@@ -1,0 +1,5 @@
+# Delete when pyproject.toml is created
+typer
+numpy
+scipy
+sklearn
