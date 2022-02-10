@@ -1,7 +1,7 @@
 from functools import partial
 import time
 
-from sklearn.metrics import f1_score
+from sklearn.metrics import multilabel_confusion_matrix
 from scipy.sparse import load_npz
 import numpy as np
 import typer
@@ -14,7 +14,11 @@ if "line_profiler" not in dir() and "profile" not in dir():
 @profile
 def f(Y_pred_proba, Y_test, thresholds):
     Y_pred = Y_pred_proba > thresholds
-    return f1_score(Y_test, Y_pred, average="micro")
+    mlcm = multilabel_confusion_matrix(Y_test, Y_pred)
+    cm = mlcm.sum(axis=0)
+    tn, fp, fn, tp = cm.ravel()
+    f1 = tp / ( tp+ (fp+fn) / 2)
+    return f1
 
 @profile
 def argmaxf1(Y_pred_proba, Y_test, optimal_thresholds, k, nb_thresholds=None):
