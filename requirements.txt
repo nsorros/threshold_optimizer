@@ -3,3 +3,4 @@ typer
 numpy
 scipy
 sklearn
+line_profiler

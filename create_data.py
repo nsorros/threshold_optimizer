@@ -10,7 +10,8 @@ def create_data(rows: int, columns: int, y_pred_path="Y_pred.npz", y_test_path="
     Y_pred_proba[Y_pred_proba < 0.2] = 0
     Y_pred_proba = csr_matrix(Y_pred_proba)
 
-    Y_test = csr_matrix(np.random.randint(0, 2, (rows, columns)))
+    thresholds = 0.5 #np.random.randn(columns)
+    Y_test = csr_matrix(Y_pred_proba > thresholds)
 
     save_npz(y_pred_path, Y_pred_proba)
     save_npz(y_test_path, Y_test)
