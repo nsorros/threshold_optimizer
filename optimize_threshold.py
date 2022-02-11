@@ -59,8 +59,8 @@ def argmaxf1(y_pred_proba, y_test, optimal_thresholds, mlcm, k, nb_thresholds=No
 
 @profile
 def optimize_threshold(y_pred_path, y_test_path, nb_thresholds:int=None):
-    Y_pred_proba = load_npz(y_pred_path)
-    Y_test = load_npz(y_test_path)
+    Y_pred_proba = load_npz(y_pred_path).tocsc()
+    Y_test = load_npz(y_test_path).tocsc()
 
     N = Y_pred_proba.shape[1]
 
@@ -88,7 +88,7 @@ def optimize_threshold(y_pred_path, y_test_path, nb_thresholds:int=None):
                 mlcm[k,:,:] = cmk
                 updated = True
 
-            print(f"label {k} - updated {updated} - time elapsed {time.time()-start:.2f}s")
+            print(f"label {k} - updated {updated} - time elapsed {time.time()-start:.3f}s")
 
 if __name__ == "__main__":
     typer.run(optimize_threshold)
