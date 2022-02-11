@@ -83,8 +83,9 @@ def optimize_threshold(y_pred_path, y_test_path, nb_thresholds:int=None):
 
             if fp(optimal_thresholds_star) > fp(optimal_thresholds):
                 optimal_thresholds = optimal_thresholds_star
-                Y_pred = Y_pred_proba > optimal_thresholds
-                mlcm = multilabel_confusion_matrix(Y_test, Y_pred)
+                y_pred = y_pred_proba > optimal_thresholds[k]
+                cmk = confusion_matrix(y_test, y_pred)
+                mlcm[k,:,:] = cmk
                 updated = True
 
             print(f"label {k} - updated {updated} - time elapsed {time.time()-start:.2f}s")
