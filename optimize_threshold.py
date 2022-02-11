@@ -27,9 +27,7 @@ def multilabel_confusion_matrix(Y_test, Y_pred):
     return np.array([tn, fp, fn, tp]).T.reshape(-1, 2, 2)
 
 @profile
-def f(Y_pred_proba, Y_test, mlcm, k, thresholds):
-    y_pred_proba = np.array(Y_pred_proba[:,k].todense()).ravel()
-    y_test = np.array(Y_test[:,k].todense()).ravel()
+def f(y_pred_proba, y_test, mlcm, k, thresholds):
     threshold = thresholds[k]
 
     y_pred = y_pred_proba > threshold
@@ -42,17 +40,16 @@ def f(Y_pred_proba, Y_test, mlcm, k, thresholds):
     return f1
 
 @profile
-def argmaxf1(Y_pred_proba, Y_test, optimal_thresholds, mlcm, k, nb_thresholds=None):
+def argmaxf1(y_pred_proba, y_test, optimal_thresholds, mlcm, k, nb_thresholds=None):
     optimal_thresholds_star = optimal_thresholds.copy()
 
-    fp = partial(f, Y_pred_proba, Y_test, mlcm, k)
+    fp = partial(f, y_pred_proba, y_test, mlcm, k)
     
     if nb_thresholds:
         thresholds = np.array([i/nb_thresholds for i in range(0, nb_thresholds)])
     else:
-        thresholds = np.unique(np.array(Y_pred_proba[:,k].todense()).ravel())
+        thresholds = np.unique(y_pred_proba)
     for threshold in thresholds:
-        print(threshold)
         optimal_thresholds_star[k] = threshold
 
         if fp(optimal_thresholds_star) > fp(optimal_thresholds):
@@ -78,9 +75,11 @@ def optimize_threshold(y_pred_path, y_test_path, nb_thresholds:int=None):
         for k in range(N):
             start = time.time()
 
-            fp = partial(f, Y_pred_proba, Y_test, mlcm, k)
+            y_pred_proba = np.array(Y_pred_proba[:,k].todense()).ravel()
+            y_test = np.array(Y_test[:,k].todense()).ravel()
+            fp = partial(f, y_pred_proba, y_test, mlcm, k)
 
-            optimal_thresholds_star = argmaxf1(Y_pred_proba, Y_test, optimal_thresholds, mlcm, k, nb_thresholds)
+            optimal_thresholds_star = argmaxf1(y_pred_proba, y_test, optimal_thresholds, mlcm, k, nb_thresholds)
 
             if fp(optimal_thresholds_star) > fp(optimal_thresholds):
                 optimal_thresholds = optimal_thresholds_star
